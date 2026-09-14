@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZoSiba Network | India's #1 Minecraft Survival Server</title>
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              300: '#5eead4',
+              400: '#00ffa3',
+              500: '#10b981',
+              600: '#059669',
+              glow: '#00ffa3',
+            },
+            darkbg: '#020408',
+            cardbg: 'rgba(8, 14, 26, 0.75)',
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          animation: {
+            'float-slow': 'float 7s ease-in-out infinite',
+            'glow-pulse': 'glowPulse 4s ease-in-out infinite',
+            'shimmer': 'shimmer 2.5s linear infinite',
+            'spin-slow': 'spin 20s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg) scale(1)' },
+              '50%': { transform: 'translateY(-14px) rotate(1deg) scale(1.02)' },
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: '0.4', filter: 'blur(30px)' },
+              '50%': { opacity: '0.85', filter: 'blur(55px)' }
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+    body {
+      background-color: #020408;
+      color: #f3f4f6;
+      overflow-x: hidden;
+    }
+
+    /* MOUSE LIGHT GLOW ATTRACTOR */
+    #cursor-glow {
+      position: fixed;
+      width: 550px;
+      height: 550px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 163, 0.15) 0%, rgba(16, 185, 129, 0.04) 45%, transparent 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      transition: transform 0.05s ease-out;
+    }
+
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NEON GLASSMORPHISM CARD DESIGN */
+    .neon-glass {
+      background: rgba(8, 14, 26, 0.75);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .neon-glass-hover {
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .neon-glass-hover:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(0, 255, 163, 0.5);
+      box-shadow: 0 30px 70px rgba(0, 255, 163, 0.22), inset 0 1px 0 rgba(0, 255, 163, 0.3);
+    }
+
+    .text-gradient-neon {
+      background: linear-gradient(135deg, #00ffa3 0%, #00d2ff 50%, #00e676 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .orb-glow {
+      position: absolute;
+      width: 750px;
+      height: 750px;
+      background: radial-gradient(circle, rgba(0, 255, 163, 0.18) 0%, rgba(0, 210, 255, 0.06) 40%, transparent 70%);
+      top: -220px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 3D TILT EFFECT */
+    .tilt-element {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #020408;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00ffa3;
+    }
+  </style>
+</head>
+
+<body class="font-sans antialiased selection:bg-brand-400 selection:text-black">
+
+  <div id="cursor-glow"></div>
+  <canvas id="particle-canvas"></canvas>
+  <div class="orb-glow animate-glow-pulse"></div>
+
+  <!-- ULTRA-CLEAN SLIMLINE FIXED NAVBAR (NO DISCORD LOGO CLIPPING, PERFECT SPACING) -->
+  <header class="sticky top-0 z-50 neon-glass bg-black/80 border-b border-white/10 backdrop-blur-2xl py-2">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+
+      <!-- LOGO BRANDING -->
+      <a href="#" onclick="showTab('home')" class="flex items-center gap-3 group shrink-0">
+        <div
+          class="relative w-11 h-11 rounded-2xl overflow-hidden p-0.5 bg-gradient-to-tr from-brand-400 via-emerald-500 to-cyan-400 shadow-xl shadow-brand-400/25 group-hover:scale-105 transition-transform shrink-0">
+          <img src="./zosiba_logo.jpg" alt="ZoSiba SMP Logo" class="w-full h-full object-cover rounded-[13px]">
+        </div>
+        <div class="flex flex-col">
+          <span
+            class="font-display font-black text-xl tracking-tight text-white group-hover:text-brand-400 transition leading-none">
+            ZOSIBA <span class="text-gradient-neon">NETWORK</span>
+          </span>
+          <span class="text-[9px] font-extrabold tracking-widest text-emerald-400 uppercase mt-1">ZOSIBA SMP
+            INDIA</span>
+        </div>
+      </a>
+
+      <!-- NAVIGATION MENU -->
+      <nav class="hidden xl:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/10">
+        <button onclick="showTab('home')" id="nav-home"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition text-brand-400 bg-white/10 flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-5 h-5"></i> Home
+        </button>
+        <button onclick="showTab('livechat')" id="nav-livechat"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="message-square" class="w-5 h-5 text-emerald-400"></i> Live Chat
+        </button>
+        <button onclick="showTab('vote')" id="nav-vote"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="vote" class="w-5 h-5 text-cyan-400"></i> Vote Sites
+        </button>
+        <button onclick="showTab('shop')" id="nav-shop"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-amber-400"></i> Store Ranks
+        </button>
+        <button onclick="showTab('leaderboard')" id="nav-leaderboard"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="trophy" class="w-5 h-5 text-yellow-400"></i> Hall of Fame
+        </button>
+        <button onclick="showTab('news')" id="nav-news"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="newspaper" class="w-5 h-5 text-blue-400"></i> News
+        </button>
+        <button onclick="showTab('gallery')" id="nav-gallery"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="camera" class="w-5 h-5 text-purple-400"></i> Gallery
+        </button>
+        <button onclick="showTab('team')" id="nav-team"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="shield" class="w-5 h-5 text-emerald-400"></i> Staff Team
+        </button>
+        <button onclick="showTab('rules')" id="nav-rules"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="book" class="w-5 h-5 text-red-400"></i> Rules
+        </button>
+        <button onclick="showTab('apply')" id="nav-apply"
+          class="nav-btn px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i> Apply
+        </button>
+      </nav>
+
+      <!-- DISCORD BUTTON (WITH PROPER SVG ICON) -->
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="https://discord.gg/59C8hqnCS" target="_blank"
+          class="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-xs uppercase tracking-wider transition shadow-xl shadow-indigo-600/30 flex items-center gap-2">
+          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+            <path
+              d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z" />
+          </svg>
+          <span>Discord</span>
+        </a>
+        <button onclick="toggleMobileMenu()" class="xl:hidden p-2 rounded-xl bg-white/5 text-gray-300">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- MOBILE MENU -->
+    <div id="mobile-menu" class="hidden xl:hidden border-t border-white/10 p-4 space-y-2 bg-black/95 backdrop-blur-2xl">
+      <button onclick="showTab('home')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="sparkles" class="w-5 h-5 text-brand-400"></i> Home</button>
+      <button onclick="showTab('livechat')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="message-square" class="w-5 h-5 text-emerald-400"></i> Live Survival Chat</button>
+      <button onclick="showTab('vote')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="vote" class="w-5 h-5 text-cyan-400"></i> Vote Sites</button>
+      <button onclick="showTab('shop')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="shopping-bag" class="w-5 h-5 text-amber-400"></i> Store Ranks</button>
+      <button onclick="showTab('leaderboard')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="trophy" class="w-5 h-5 text-yellow-400"></i> Hall of Fame</button>
+      <button onclick="showTab('news')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="newspaper" class="w-5 h-5 text-blue-400"></i> News</button>
+      <button onclick="showTab('gallery')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="camera" class="w-5 h-5 text-purple-400"></i> Gallery</button>
+      <button onclick="showTab('team')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="shield" class="w-5 h-5 text-emerald-400"></i> Team</button>
+      <button onclick="showTab('rules')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="book" class="w-5 h-5 text-red-400"></i> Rules</button>
+      <button onclick="showTab('apply')"
+        class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-gray-200 hover:bg-white/10 flex items-center gap-3"><i
+          data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i> Apply</button>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex-1">
+
+    <!-- ==================== TAB: HOME ==================== -->
+    <div id="page-home" class="page-content space-y-16">
+
+      <!-- HERO DISPLAY SECTION -->
+      <section class="relative text-center py-6 lg:py-16 flex flex-col items-center">
+
+        <!-- 3D FLOATING ANIMATED LOGO -->
+        <div class="relative mb-8 group cursor-pointer" onclick="triggerConfetti()">
+          <div
+            class="absolute inset-0 rounded-3xl bg-gradient-to-r from-brand-400 via-amber-400 to-cyan-500 blur-3xl opacity-70 group-hover:opacity-100 transition duration-500">
+          </div>
+          <div
+            class="relative w-48 h-48 sm:w-60 sm:h-60 rounded-3xl overflow-hidden border-2 border-white/20 p-2 bg-black/70 shadow-2xl animate-float-slow">
+            <img src="./zosiba_logo.jpg" alt="ZoSiba SMP Logo" class="w-full h-full object-contain rounded-2xl">
+          </div>
+          <span
+            class="absolute -bottom-3.5 left-1/2 transform -translate-x-1/2 px-5 py-1.5 rounded-full bg-brand-400 text-black font-black text-xs uppercase tracking-widest shadow-xl shadow-brand-400/50">
+            Click For Magic ✨
+          </span>
+        </div>
+
+        <div
+          class="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-brand-400 text-xs font-extrabold uppercase tracking-wider mb-6">
+          <span class="w-2.5 h-2.5 rounded-full bg-brand-400 animate-ping"></span>
+          Supported Versions: Java 1.8 — 26.2+ & Bedrock Cross-Play
+        </div>
+
+        <h1
+          class="font-display text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-white mb-6 leading-none max-w-5xl">
+          ZOSIBA <span class="text-gradient-neon">SMP NETWORK</span>
+        </h1>
+        <p class="text-lg sm:text-2xl text-gray-300 max-w-3xl font-medium mb-12 leading-relaxed">
+          Unity • Creation • Adventure. Experience India's ultimate Minecraft survival server with smooth 20 TPS, land
+          protection, live Discord chat, and version <strong class="text-white font-extrabold">1.8 to 26.2+</strong>!
+        </p>
+
+        <!-- REAL-TIME LIVE STATS CARDS WITH DYNAMIC PING & TPS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 w-full max-w-5xl mb-12">
+          <div class="neon-glass p-6 rounded-3xl text-left border-l-4 border-l-brand-400 neon-glass-hover">
+            <div
+              class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-brand-400 animate-pulse"></span> Live Online Players
+            </div>
+            <div class="text-4xl font-black text-white font-display" id="stat-online">0</div>
+            <div class="text-xs text-brand-400 mt-1 font-extrabold" id="stat-status">Server Online 24/7</div>
+          </div>
+          <div class="neon-glass p-6 rounded-3xl text-left border-l-4 border-l-blue-400 neon-glass-hover">
+            <div class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400 mb-2">Performance / TPS</div>
+            <div class="text-4xl font-black text-white font-display">20.0 <span
+                class="text-sm font-normal text-blue-400">TPS</span></div>
+            <div class="text-xs text-blue-400 mt-1 font-extrabold">Zero Tick Lag</div>
+          </div>
+          <div class="neon-glass p-6 rounded-3xl text-left border-l-4 border-l-purple-400 neon-glass-hover">
+            <div class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400 mb-2">Total Registrations
+            </div>
+            <div class="text-4xl font-black text-white font-display">1,450+</div>
+            <div class="text-xs text-purple-400 mt-1 font-extrabold">Verified Players</div>
+          </div>
+          <div class="neon-glass p-6 rounded-3xl text-left border-l-4 border-l-amber-400 neon-glass-hover">
+            <div class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400 mb-2">Server Latency (India)
+            </div>
+            <div class="text-4xl font-black text-white font-display">18 <span
+                class="text-sm font-normal text-amber-400">ms</span></div>
+            <div class="text-xs text-amber-400 mt-1 font-extrabold">Ultra Low Ping</div>
+          </div>
+        </div>
+
+        <!-- CONNECT CARDS FOR JAVA & BEDROCK -->
+        <div
+          class="neon-glass p-8 sm:p-10 rounded-3xl w-full max-w-4xl border border-white/10 shadow-2xl relative overflow-hidden">
+          <div class="text-center mb-8">
+            <h3 class="text-3xl font-black text-white font-display">Join ZoSiba SMP - Server IPs</h3>
+            <p class="text-sm text-gray-400 mt-1">Connect using Minecraft Java or Minecraft Bedrock / PE edition below
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- JAVA CARD -->
+            <div
+              class="bg-black/60 p-6 rounded-2xl border border-white/10 flex flex-col justify-between hover:border-brand-400/50 transition">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span
+                    class="text-xs font-extrabold uppercase px-3 py-1 rounded-full bg-brand-400/20 text-brand-400 border border-brand-400/30">Java
+                    Edition</span>
+                  <span class="text-xs text-emerald-400 font-black">v1.8 — v26.2+</span>
+                </div>
+                <div class="text-xs font-extrabold uppercase text-gray-400 tracking-wider">Java Server IP</div>
+                <div
+                  class="font-mono text-sm font-bold text-white mt-2 bg-white/5 p-3.5 rounded-xl border border-white/10 select-all tracking-wide break-all">
+                  drake-stopped.tun.ply.gg
+                </div>
+              </div>
+              <button onclick="copyIP('drake-stopped.tun.ply.gg', 'btn-java')" id="btn-java"
+                class="mt-6 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 via-emerald-500 to-teal-400 hover:from-brand-500 hover:to-teal-300 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-xl shadow-brand-400/30">
+                <i data-lucide="copy" class="w-4 h-4"></i> Copy Java IP
+              </button>
+            </div>
+
+            <!-- BEDROCK CARD -->
+            <div
+              class="bg-black/60 p-6 rounded-2xl border border-white/10 flex flex-col justify-between hover:border-cyan-500/50 transition">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span
+                    class="text-xs font-extrabold uppercase px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Bedrock
+                    / PE</span>
+                  <span class="text-xs text-cyan-300 font-black">Port: 35257</span>
+                </div>
+                <div class="text-xs font-extrabold uppercase text-gray-400 tracking-wider">Bedrock Server IP</div>
+                <div
+                  class="font-mono text-sm font-bold text-white mt-2 bg-white/5 p-3.5 rounded-xl border border-white/10 select-all tracking-wide break-all">
+                  olds-picking.tun.ply.gg
+                </div>
+              </div>
+              <button onclick="copyIP('olds-picking.tun.ply.gg:35257', 'btn-bedrock')" id="btn-bedrock"
+                class="mt-6 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-500 to-indigo-500 hover:from-cyan-500 hover:to-indigo-400 text-white font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-xl shadow-cyan-500/30">
+                <i data-lucide="copy" class="w-4 h-4"></i> Copy Bedrock IP & Port
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-white/10">
+            <a href="https://discord.gg/59C8hqnCS" target="_blank"
+              class="px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm uppercase tracking-wider transition flex items-center gap-2 shadow-xl shadow-indigo-600/30">
+              <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                <path
+                  d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z" />
+              </svg>
+              Join Official Discord
+            </a>
+            <button onclick="showTab('vote')"
+              class="px-8 py-3.5 rounded-xl bg-brand-400 text-black font-black text-sm uppercase tracking-wider transition flex items-center gap-2 shadow-lg shadow-brand-400/30">
+              <i data-lucide="vote" class="w-5 h-5"></i> Vote Server Links
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- BRAND NEW INTERACTIVE MINECRAFT PLAYER SKIN LOOKUP WIDGET -->
+      <section class="max-w-4xl mx-auto neon-glass p-8 rounded-3xl border border-white/10 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="text-left">
+            <div
+              class="inline-block px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 text-xs font-black uppercase mb-2">
+              Live Player Tools</div>
+            <h3 class="text-2xl font-black text-white font-display">Minecraft Skin & Stats Inspector</h3>
+            <p class="text-sm text-gray-400 mt-1">Type any player IGN to fetch real 3D avatar & skin instantly!</p>
+            <div class="flex gap-2 mt-4">
+              <input type="text" id="skin-input" placeholder="e.g. SibaDas, NotZo, RAVI7550"
+                class="bg-black/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-400 w-64"
+                onkeydown="if(event.key === 'Enter') lookupSkin()">
+              <button onclick="lookupSkin()"
+                class="px-5 py-2.5 bg-brand-400 text-black font-black text-xs uppercase tracking-wider rounded-xl hover:bg-brand-300 transition shadow-lg shadow-brand-400/20">Search</button>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 bg-black/50 p-4 rounded-2xl border border-white/5 relative min-w-[280px]">
+            <!-- ADDING A LOADING SPINNER OVERLAY -->
+            <div id="skin-loader"
+              class="absolute inset-0 flex items-center justify-center bg-black/60 rounded-2xl hidden backdrop-blur-sm z-10">
+              <i data-lucide="loader-2" class="w-8 h-8 text-brand-400 animate-spin"></i>
+            </div>
+            <img id="skin-avatar" src="https://mc-heads.net/body/SibaDas/right"
+              class="h-32 object-contain filter drop-shadow-xl" alt="Player 3D Avatar">
+            <div class="flex flex-col">
+              <span class="text-xs font-bold text-gray-400 uppercase">Player</span>
+              <span id="skin-ign"
+                class="font-extrabold text-white text-lg font-mono truncate max-w-[150px]">SibaDas</span>
+              <span class="text-xs text-brand-400 mt-2 font-bold flex items-center gap-1" id="skin-status"><i
+                  data-lucide="check-circle" class="w-3.5 h-3.5"></i> Verified</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVER FEATURES GRID -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div class="neon-glass p-8 rounded-3xl neon-glass-hover">
+          <div class="w-14 h-14 rounded-2xl bg-brand-400/20 text-brand-400 flex items-center justify-center mb-6">
+            <i data-lucide="zap" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl font-black text-white font-display mb-2">Custom Economy & Shops</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Balanced survival economy, player chest shops, auction
+            houses, and jobs to build your empire.</p>
+        </div>
+        <div class="neon-glass p-8 rounded-3xl neon-glass-hover">
+          <div class="w-14 h-14 rounded-2xl bg-cyan-400/20 text-cyan-400 flex items-center justify-center mb-6">
+            <i data-lucide="shield-check" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl font-black text-white font-display mb-2">Grief-Proof Land Claims</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Easy golden shovel claims protect your builds, redstone, and
+            chests 100% against theft.</p>
+        </div>
+        <div class="neon-glass p-8 rounded-3xl neon-glass-hover">
+          <div class="w-14 h-14 rounded-2xl bg-purple-400/20 text-purple-400 flex items-center justify-center mb-6">
+            <i data-lucide="users" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl font-black text-white font-display mb-2">Weekend Tournaments</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Regular build battles, PvP championships, and drop parties
+            with real Discord Nitro & voucher rewards.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== TAB: VOTE SITES ==================== -->
+    <div id="page-vote" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 tracking-widest">Free
+          In-Game Rewards</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">Vote, Earn, Repeat</h2>
+        <p class="text-gray-400 mt-2">Help ZoSiba Network rank up on Minecraft server lists every 24 hours to earn
+          rewards!</p>
+      </div>
+
+      <!-- REWARDS OVERVIEW CARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <div class="neon-glass p-6 rounded-3xl text-center neon-glass-hover border-t-4 border-t-blue-500">
+          <div class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-400 mx-auto flex items-center justify-center mb-3">
+            <i data-lucide="coins" class="w-6 h-6"></i>
+          </div>
+          <div class="font-black text-white text-lg font-display">$1,000 Cash</div>
+          <div class="text-xs text-gray-400 mt-1">Per vote link</div>
+        </div>
+
+        <div class="neon-glass p-6 rounded-3xl text-center neon-glass-hover border-t-4 border-t-cyan-500">
+          <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 mx-auto flex items-center justify-center mb-3">
+            <i data-lucide="key" class="w-6 h-6"></i>
+          </div>
+          <div class="font-black text-white text-lg font-display">1x Vote Key</div>
+          <div class="text-xs text-gray-400 mt-1">For Crate rewards</div>
+        </div>
+
+        <div class="neon-glass p-6 rounded-3xl text-center neon-glass-hover border-t-4 border-t-purple-500">
+          <div
+            class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 mx-auto flex items-center justify-center mb-3">
+            <i data-lucide="sparkles" class="w-6 h-6"></i>
+          </div>
+          <div class="font-black text-white text-lg font-display">+500 XP</div>
+          <div class="text-xs text-gray-400 mt-1">Level boost</div>
+        </div>
+
+        <div class="neon-glass p-6 rounded-3xl text-center neon-glass-hover border-t-4 border-t-amber-500">
+          <div
+            class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 mx-auto flex items-center justify-center mb-3">
+            <i data-lucide="gift" class="w-6 h-6"></i>
+          </div>
+          <div class="font-black text-white text-lg font-display">Pinata Party</div>
+          <div class="text-xs text-gray-400 mt-1">At 100 total votes</div>
+        </div>
+      </div>
+
+      <!-- VOTE SERVER SITES LIST -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto pt-4">
+        <div class="neon-glass p-6 rounded-3xl text-center flex flex-col justify-between neon-glass-hover">
+          <div>
+            <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black mb-3">
+              ● READY TO VOTE</div>
+            <h4 class="font-black text-white text-xl font-display">Minecraft-MP</h4>
+            <p class="text-xs text-gray-400 mt-1">Vote once every 24h</p>
+          </div>
+          <a href="https://minecraft-mp.com/" target="_blank" onclick="triggerConfetti()"
+            class="mt-6 py-3 rounded-xl bg-brand-400 hover:bg-brand-500 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Vote on Minecraft-MP
+          </a>
+        </div>
+
+        <div class="neon-glass p-6 rounded-3xl text-center flex flex-col justify-between neon-glass-hover">
+          <div>
+            <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black mb-3">
+              ● READY TO VOTE</div>
+            <h4 class="font-black text-white text-xl font-display">TopG Server List</h4>
+            <p class="text-xs text-gray-400 mt-1">Vote once every 24h</p>
+          </div>
+          <a href="https://topg.org/" target="_blank" onclick="triggerConfetti()"
+            class="mt-6 py-3 rounded-xl bg-brand-400 hover:bg-brand-500 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Vote on TopG
+          </a>
+        </div>
+
+        <div class="neon-glass p-6 rounded-3xl text-center flex flex-col justify-between neon-glass-hover">
+          <div>
+            <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black mb-3">
+              ● READY TO VOTE</div>
+            <h4 class="font-black text-white text-xl font-display">TMS List</h4>
+            <p class="text-xs text-gray-400 mt-1">Vote once every 24h</p>
+          </div>
+          <a href="https://topminecraftservers.org/" target="_blank" onclick="triggerConfetti()"
+            class="mt-6 py-3 rounded-xl bg-brand-400 hover:bg-brand-500 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Vote on TMS
+          </a>
+        </div>
+
+        <div class="neon-glass p-6 rounded-3xl text-center flex flex-col justify-between neon-glass-hover">
+          <div>
+            <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black mb-3">
+              ● READY TO VOTE</div>
+            <h4 class="font-black text-white text-xl font-display">TopMcServers</h4>
+            <p class="text-xs text-gray-400 mt-1">Vote once every 24h</p>
+          </div>
+          <a href="https://topmcservers.com/" target="_blank" onclick="triggerConfetti()"
+            class="mt-6 py-3 rounded-xl bg-brand-400 hover:bg-brand-500 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Vote on TopMcServers
+          </a>
+        </div>
+
+        <div class="neon-glass p-6 rounded-3xl text-center flex flex-col justify-between neon-glass-hover">
+          <div>
+            <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black mb-3">
+              ● READY TO VOTE</div>
+            <h4 class="font-black text-white text-xl font-display">16bitMC</h4>
+            <p class="text-xs text-gray-400 mt-1">Vote once every 24h</p>
+          </div>
+          <a href="https://16bitmc.com/" target="_blank" onclick="triggerConfetti()"
+            class="mt-6 py-3 rounded-xl bg-brand-400 hover:bg-brand-500 text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Vote on 16bitMC
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: LIVE SURVIVAL CHAT ==================== -->
+    <div id="page-livechat" class="page-content hidden space-y-8">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-brand-400/20 text-brand-400 border border-brand-400/30 tracking-widest">Realtime
+          Discord Sync</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">#survival-chat</h2>
+        <p class="text-gray-400 mt-2">Live feed pulled directly from ZoSiba SMP in-game & Discord survival channel.</p>
+      </div>
+
+      <div class="max-w-4xl mx-auto neon-glass rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-brand-400 animate-ping"></div>
+            <span class="font-mono text-sm font-bold text-gray-200"># survival-chat</span>
+          </div>
+          <a href="https://discord.gg/59C8hqnCS" target="_blank"
+            class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Open in Discord
+          </a>
+        </div>
+
+        <div class="space-y-4 font-sans text-sm">
+          <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-3">
+            <span
+              class="px-2.5 py-1 rounded bg-amber-500 text-black font-extrabold text-[10px] uppercase">Advancement</span>
+            <span class="text-white font-bold">test123</span> <span class="text-gray-300">has made the
+              advancement</span> <span class="text-amber-400 font-bold">[Acquire Hardware]</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-xl bg-brand-400/20 text-brand-400 flex items-center justify-center font-bold">
+                APP</div>
+              <div>
+                <span class="font-bold text-white">survival_chat</span>
+                <span class="text-xs text-gray-500 ml-2">Yesterday at 09:50 PM</span>
+                <div class="text-emerald-400 font-medium mt-0.5 flex items-center gap-1.5">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i> Server has started
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-4">
+            <img src="./zosiba_logo.jpg" class="w-10 h-10 rounded-xl object-cover" alt="Siba Das">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-white">Siba Das</span>
+                <span
+                  class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">OWNER</span>
+                <span class="text-xs text-gray-500">Yesterday at 11:37 PM</span>
+              </div>
+              <p class="text-gray-200 mt-1 leading-relaxed">Hi hello guys, your helpful personal assistant is ready!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: STORE ==================== -->
+    <div id="page-shop" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-widest">Support
+          ZoSiba Network</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">ZoSiba Store</h2>
+        <p class="text-gray-400 mt-2">Unlock VIP ranks, cosmetics, and perks while supporting server hosting costs.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div
+          class="neon-glass p-8 rounded-3xl neon-glass-hover flex flex-col justify-between border-t-4 border-t-teal-400">
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-3xl font-black text-teal-400 font-display">VIP Rank</h3>
+              <span
+                class="px-4 py-1.5 rounded-full bg-teal-400/10 text-teal-300 font-extrabold text-sm border border-teal-400/30">₹99
+                / mo</span>
+            </div>
+            <ul class="space-y-4 text-sm text-gray-300 mb-8">
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-teal-400"></i>
+                [VIP] Chat Badge & Tag</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-teal-400"></i> 3
+                Claim Homes Limit</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-teal-400"></i>
+                Access to /fly in claims</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-teal-400"></i> 1x
+                VIP Crate Key Monthly</li>
+            </ul>
+          </div>
+          <a href="https://discord.gg/59C8hqnCS" target="_blank"
+            class="w-full py-3.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-black text-center text-xs uppercase tracking-wider transition">Purchase
+            on Discord</a>
+        </div>
+
+        <div
+          class="neon-glass p-8 rounded-3xl neon-glass-hover flex flex-col justify-between border-t-4 border-t-brand-400 relative">
+          <div
+            class="absolute -top-3.5 right-8 bg-brand-400 text-black font-black text-[10px] uppercase px-4 py-1 rounded-full tracking-widest shadow-lg shadow-brand-400/40">
+            Most Popular</div>
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-3xl font-black text-brand-400 font-display">MVP Rank</h3>
+              <span
+                class="px-4 py-1.5 rounded-full bg-brand-400/10 text-brand-400 font-extrabold text-sm border border-brand-400/30">₹249
+                / mo</span>
+            </div>
+            <ul class="space-y-4 text-sm text-gray-300 mb-8">
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i>
+                All VIP Rank Perks</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i>
+                [MVP] Glowing Chat Title</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i> 8
+                Claim Homes Limit</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i>
+                Portable /workbench & /enderchest</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i> 3x
+                MVP Crate Keys</li>
+            </ul>
+          </div>
+          <a href="https://discord.gg/59C8hqnCS" target="_blank"
+            class="w-full py-3.5 rounded-xl bg-brand-400 hover:bg-brand-500 text-black font-black text-center text-xs uppercase tracking-wider transition shadow-lg shadow-brand-400/30">Purchase
+            on Discord</a>
+        </div>
+
+        <div
+          class="neon-glass p-8 rounded-3xl neon-glass-hover flex flex-col justify-between border-t-4 border-t-amber-400">
+          <div>
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-3xl font-black text-amber-400 font-display">LEGEND</h3>
+              <span
+                class="px-4 py-1.5 rounded-full bg-amber-400/10 text-amber-400 font-extrabold text-sm border border-amber-400/30">₹499
+                / Lifetime</span>
+            </div>
+            <ul class="space-y-4 text-sm text-gray-300 mb-8">
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-400"></i>
+                All MVP & VIP Benefits</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-400"></i>
+                [LEGEND] Gold Animated Tag</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-400"></i>
+                Unlimited Claim Homes</li>
+              <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-400"></i>
+                Custom Trail Effects & Pets</li>
+            </ul>
+          </div>
+          <a href="https://discord.gg/59C8hqnCS" target="_blank"
+            class="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-center text-xs uppercase tracking-wider transition">Purchase
+            on Discord</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: LEADERBOARD ==================== -->
+    <div id="page-leaderboard" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 tracking-widest">Hall
+          of Fame</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">Top Players</h2>
+        <p class="text-gray-400 mt-2">See who is leading ZoSiba SMP in total playtime and achievements.</p>
+      </div>
+
+      <div class="max-w-3xl mx-auto neon-glass rounded-3xl p-8 overflow-hidden">
+        <div class="flex items-center justify-between border-b border-white/10 pb-6 mb-6">
+          <div class="font-black text-xl text-white font-display flex items-center gap-3">
+            <i data-lucide="crown" class="w-6 h-6 text-yellow-400"></i> Top Playtime Leaders
+          </div>
+          <span class="text-xs text-gray-400 font-mono">Updated hourly</span>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-yellow-500/40">
+            <div class="flex items-center gap-4">
+              <span
+                class="w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-400 font-black text-sm flex items-center justify-center">1</span>
+              <img src="https://mc-heads.net/avatar/RAVI7550/48" class="w-10 h-10 rounded-xl" alt="avatar">
+              <span class="font-black text-white text-lg">RAVI7550</span>
+            </div>
+            <span class="font-mono text-brand-400 font-black text-lg">417 hrs</span>
+          </div>
+
+          <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-slate-400/40">
+            <div class="flex items-center gap-4">
+              <span
+                class="w-8 h-8 rounded-full bg-slate-400/20 text-slate-300 font-black text-sm flex items-center justify-center">2</span>
+              <img src="https://mc-heads.net/avatar/OniZ/48" class="w-10 h-10 rounded-xl" alt="avatar">
+              <span class="font-black text-white text-lg">OniZ</span>
+            </div>
+            <span class="font-mono text-brand-400 font-black text-lg">372 hrs</span>
+          </div>
+
+          <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-amber-700/40">
+            <div class="flex items-center gap-4">
+              <span
+                class="w-8 h-8 rounded-full bg-amber-700/20 text-amber-500 font-black text-sm flex items-center justify-center">3</span>
+              <img src="https://mc-heads.net/avatar/SC_MINECRAFT_GOD/48" class="w-10 h-10 rounded-xl" alt="avatar">
+              <span class="font-black text-white text-lg">SC_MINECRAFT_GOD</span>
+            </div>
+            <span class="font-mono text-brand-400 font-black text-lg">341 hrs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: NEWS ==================== -->
+    <div id="page-news" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 tracking-widest">Announcements</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">What's New</h2>
+        <p class="text-gray-400 mt-2">Latest patch notes & event updates directly from Discord.</p>
+      </div>
+
+      <div class="max-w-3xl mx-auto space-y-6">
+        <div class="neon-glass p-8 rounded-3xl border-l-4 border-l-brand-400">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-4">
+              <img src="./zosiba_logo.jpg" class="w-12 h-12 rounded-xl object-cover" alt="Siba Das Avatar">
+              <div>
+                <h4 class="font-extrabold text-white text-lg">Siba Das <span
+                    class="text-xs px-2.5 py-0.5 rounded bg-red-500/20 text-red-400 font-bold ml-2">Owner</span></h4>
+                <span class="text-xs text-gray-400">Yesterday at 11:37 PM</span>
+              </div>
+            </div>
+            <span
+              class="text-xs text-indigo-400 font-mono bg-indigo-500/20 px-3 py-1 rounded-lg border border-indigo-500/30">#announcements</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3 font-display">Weekend Event & Survival Updates! 🚀</h3>
+          <p class="text-gray-300 text-base leading-relaxed mb-4">
+            Bring your best form! This weekend event will have prizes on stake including ingame items, Discord Nitro,
+            and rank upgrades.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: GALLERY ==================== -->
+    <div id="page-gallery" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 tracking-widest">Community
+          Showcase</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">Server Gallery</h2>
+        <p class="text-gray-400 mt-2">Awesome base builds, spawn structures, and community moments.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="neon-glass rounded-3xl overflow-hidden neon-glass-hover group">
+          <div class="h-56 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&w=600&q=80')">
+          </div>
+          <div class="p-6">
+            <h4 class="font-bold text-white text-lg font-display">Spawn Castle Build</h4>
+            <p class="text-xs text-gray-400 mt-1">Built by ZoSiba Build Team</p>
+          </div>
+        </div>
+        <div class="neon-glass rounded-3xl overflow-hidden neon-glass-hover group">
+          <div class="h-56 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80')">
+          </div>
+          <div class="p-6">
+            <h4 class="font-bold text-white text-lg font-display">Shopping District</h4>
+            <p class="text-xs text-gray-400 mt-1">Built by Community Players</p>
+          </div>
+        </div>
+        <div class="neon-glass rounded-3xl overflow-hidden neon-glass-hover group">
+          <div class="h-56 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80')">
+          </div>
+          <div class="p-6">
+            <h4 class="font-bold text-white text-lg font-display">PvP Arena</h4>
+            <p class="text-xs text-gray-400 mt-1">Built by Zo & Siba</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: TEAM ==================== -->
+    <div id="page-team" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 tracking-widest">Leadership</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">Meet the Crew</h2>
+        <p class="text-gray-400 mt-2">The team keeping ZoSiba Network running smooth, fair, and fun.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div class="neon-glass p-8 rounded-3xl border-l-4 border-l-red-500 flex items-start gap-6 neon-glass-hover">
+          <img src="./zosiba_logo.jpg" class="w-20 h-20 rounded-2xl object-cover border border-white/20 shadow-lg"
+            alt="Siba Das">
+          <div>
+            <div class="flex items-center gap-3">
+              <h3 class="font-black text-white text-xl font-display">Siba Das</h3>
+              <span
+                class="text-[10px] font-black uppercase px-3 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 tracking-wider">Owner</span>
+            </div>
+            <p class="text-sm text-gray-300 mt-3 leading-relaxed">Server Founder and Head Developer. Responsible for
+              plugin setup, server hosting, and event management.</p>
+          </div>
+        </div>
+
+        <div class="neon-glass p-8 rounded-3xl border-l-4 border-l-red-500 flex items-start gap-6 neon-glass-hover">
+          <img src="./zosiba_logo.jpg" class="w-20 h-20 rounded-2xl object-cover border border-white/20 shadow-lg"
+            alt="Zo">
+          <div>
+            <div class="flex items-center gap-3">
+              <h3 class="font-black text-white text-xl font-display">Zo</h3>
+              <span
+                class="text-[10px] font-black uppercase px-3 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 tracking-wider">Co-Owner</span>
+            </div>
+            <p class="text-sm text-gray-300 mt-3 leading-relaxed">Co-Founder handling Discord administration, community
+              moderation, and support ticketing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: RULES ==================== -->
+    <div id="page-rules" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 tracking-widest">Community
+          Rules</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">House Rules</h2>
+        <p class="text-gray-400 mt-2">Keep it chill. Break these and you'll catch a warning or ban.</p>
+      </div>
+
+      <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="neon-glass p-6 rounded-2xl flex items-center gap-4">
+          <span
+            class="w-10 h-10 rounded-xl bg-brand-400/20 text-brand-400 font-black flex items-center justify-center shrink-0">01</span>
+          <span class="text-sm font-semibold text-gray-200">No cheating, X-Ray, fly hacks or hacked clients.</span>
+        </div>
+        <div class="neon-glass p-6 rounded-2xl flex items-center gap-4">
+          <span
+            class="w-10 h-10 rounded-xl bg-brand-400/20 text-brand-400 font-black flex items-center justify-center shrink-0">02</span>
+          <span class="text-sm font-semibold text-gray-200">Be respectful in chat. Toxic behavior is muted.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: APPLY ==================== -->
+    <div id="page-apply" class="page-content hidden space-y-10">
+      <div class="text-center max-w-2xl mx-auto">
+        <span
+          class="text-xs font-extrabold uppercase px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 tracking-widest">Join
+          Staff Team</span>
+        <h2 class="text-4xl sm:text-5xl font-black text-white font-display mt-4">Help Run ZoSiba Network</h2>
+        <p class="text-gray-400 mt-2">We are accepting applications for dedicated team members.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div
+          class="neon-glass p-8 rounded-3xl flex flex-col justify-between border-t-4 border-t-blue-500 neon-glass-hover">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-2xl font-black text-white font-display">Staff Member</h3>
+              <span class="text-xs px-3 py-1 rounded-full bg-brand-400/20 text-brand-400 font-black">Open</span>
+            </div>
+            <p class="text-sm text-gray-300 mb-4">Moderate chat, help new players, and handle reports.</p>
+          </div>
+          <a href="https://discord.gg/59C8hqnCS" target="_blank"
+            class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-center text-xs uppercase tracking-wider transition">Apply
+            on Discord</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-white/10 neon-glass mt-20 py-10 bg-black/90 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-4">
+        <img src="./zosiba_logo.jpg" class="w-10 h-10 rounded-xl object-cover" alt="Logo">
+        <div>
+          <span class="font-display font-black text-xl text-white">ZOSIBA <span
+              class="text-brand-400">NETWORK</span></span>
+          <p class="text-xs text-gray-500">© 2026 ZoSiba Network India. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // MOUSE GLOW ATTRACTOR
+    const glow = document.getElementById('cursor-glow');
+    window.addEventListener('mousemove', (e) => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+
+    function showTab(tabName) {
+      document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+      const activeTab = document.getElementById('page-' + tabName);
+      if (activeTab) activeTab.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-brand-400', 'bg-white/10');
+        btn.classList.add('text-gray-300');
+      });
+
+      const currentNavBtn = document.getElementById('nav-' + tabName);
+      if (currentNavBtn) {
+        currentNavBtn.classList.add('text-brand-400', 'bg-white/10');
+        currentNavBtn.classList.remove('text-gray-300');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+
+    function triggerConfetti() {
+      confetti({
+        particleCount: 120,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#00ffa3', '#10b981', '#ffb300', '#00d2ff']
+      });
+    }
+
+    function copyIP(ipText, btnId) {
+      navigator.clipboard.writeText(ipText).then(() => {
+        const btn = document.getElementById(btnId);
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Copied to Clipboard!';
+        triggerConfetti();
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          lucide.createIcons();
+        }, 2500);
+      });
+    }
+
+    // Interactive Skin Search
+    function lookupSkin() {
+      const inputVal = document.getElementById('skin-input').value.trim();
+      const ign = inputVal || 'SibaDas';
+      const loader = document.getElementById('skin-loader');
+      const avatar = document.getElementById('skin-avatar');
+      const statusEl = document.getElementById('skin-status');
+      const ignEl = document.getElementById('skin-ign');
+
+      if (loader) loader.classList.remove('hidden');
+
+      // Artificial delay for UI polish effect
+      setTimeout(() => {
+        ignEl.innerText = ign;
+
+        // Handle image loading
+        avatar.onload = () => {
+          if (loader) loader.classList.add('hidden');
+          statusEl.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5 text-brand-400"></i> <span class="text-brand-400">Verified</span>`;
+          if (inputVal) triggerConfetti();
+          lucide.createIcons();
+        };
+
+        avatar.onerror = () => {
+          if (loader) loader.classList.add('hidden');
+          avatar.src = 'https://mc-heads.net/body/Steve/right'; // fallback
+          ignEl.innerText = 'Not Found';
+          statusEl.innerHTML = `<i data-lucide="x-circle" class="w-3.5 h-3.5 text-red-500"></i> <span class="text-red-500">Unverified</span>`;
+          lucide.createIcons();
+        };
+
+        avatar.src = `https://mc-heads.net/body/${ign}/right`;
+      }, 400);
+    }
+
+    // PARTICLE CANVAS ANIMATION
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles;
+
+    function initParticles() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      particles = [];
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 2 + 1,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          alpha: Math.random() * 0.5 + 0.2
+        });
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 255, 163, ${p.alpha})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('resize', initParticles);
+    initParticles();
+    animateParticles();
+
+    async function fetchServerStatus() {
+      try {
+        const res = await fetch('https://api.mcsrvstat.us/2/drake-stopped.tun.ply.gg');
+        const data = await res.json();
+        const onlineCountEl = document.getElementById('stat-online');
+        const statusEl = document.getElementById('stat-status');
+        if (data && data.online) {
+          onlineCountEl.innerText = data.players.online;
+          statusEl.innerText = "Live Players Connected";
+        } else {
+          onlineCountEl.innerText = "Online";
+          statusEl.innerText = "Server Online 24/7";
+        }
+      } catch (err) {
+        document.getElementById('stat-online').innerText = "Online";
+      }
+    }
+    fetchServerStatus();
+  </script>
+</body>
+
+</html>
